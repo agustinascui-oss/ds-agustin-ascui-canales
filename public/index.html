@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Observatorio Laboral · Atomic Design (INE Chile ENE 2026)</title>
+  <meta name="description" content="Sistema Atomic Design para Observatorio Laboral con datos reales de la Encuesta Nacional de Empleo (ENE) 2026 y Glosario ENE 2025 del INE Chile." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,300..900;1,6..12,300..900&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brandNavy: '#0D2847',
+            brandNavyDark: '#0A2540',
+            brandBlueMedium: '#12365e',
+            brandTeal: '#17859E',
+            brandCyan: '#A5D8E2',
+            brandCream: '#FAF7F2',
+            brandSky: '#EAF4F7',
+          },
+          fontFamily: {
+            sans: ['"Nunito Sans"', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #FAF7F2;
+      color: #0D2847;
+      font-family: 'Nunito Sans', system-ui, sans-serif;
+    }
+    @media print {
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body class="w-full bg-[#FAF7F2] text-[#0D2847] antialiased selection:bg-[#A5D8E2] selection:text-[#0D2847]">
+
+  <!-- CABECERA AZUL (Sin botones Guion ni Fundamentos) -->
+  <header class="no-print bg-[#0D2847] text-white py-2.5 px-4 md:px-8 border-b border-[#17859E]/30 flex flex-wrap items-center justify-between gap-3 text-xs">
+    <div class="flex items-center gap-3">
+      <span class="font-bold tracking-tight text-white flex items-center gap-1.5">
+        <span class="w-2.5 h-2.5 rounded-full bg-[#17859E]"></span>
+        Observatorio Laboral
+      </span>
+      <span class="text-slate-400">·</span>
+      <span class="text-slate-300 font-medium hidden sm:inline">Atomic Design & Periodismo de Datos</span>
+      <span class="hidden sm:inline-block bg-[#17859E]/40 text-[#A5D8E2] px-2 py-0.5 rounded text-[11px] font-mono">
+        INE Chile · ENE 2026
+      </span>
+    </div>
+
+    <div class="flex items-center flex-wrap gap-2">
+      <button onclick="openGlossaryModal()" class="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#17859E] hover:bg-[#147086] text-white font-semibold transition-colors cursor-pointer text-xs">
+        <span>📖 Glosario ENE 2025</span>
+      </button>
+      <button onclick="openWhyModal(null)" class="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#0D2847] border border-[#17859E] hover:bg-[#17859E] text-white font-semibold transition-colors cursor-pointer text-xs">
+        <span>¿Por qué cada botón?</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- SUB-BARRA DEBAJO DE LA CABECERA AZUL: SELECTOR DE BOLETINES INE 2026 -->
+  <section class="no-print bg-white border-b border-slate-200/90 shadow-sm px-4 md:px-8 py-3">
+    <div class="max-w-[1680px] mx-auto flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
+      <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 flex-1 min-w-0">
+        <label for="bulletinSelect" class="text-xs sm:text-sm font-black text-[#0D2847] flex items-center gap-1.5 shrink-0">
+          <span class="w-2.5 h-2.5 rounded-full bg-[#17859E]"></span>
+          <span>Cambiar Boletín Oficial INE (2026):</span>
+        </label>
+        <select id="bulletinSelect" onchange="changeBulletin(this.value)" class="w-full sm:max-w-2xl bg-[#FAF7F2] hover:bg-[#EAF4F7] text-[#0D2847] text-xs sm:text-sm font-extrabold rounded-xl py-2 px-3.5 border-2 border-[#17859E]/60 focus:border-[#17859E] focus:outline-none cursor-pointer">
+          <option value="b336" selected>Boletín N° 336 (Julio - Septiembre 2026) · Desocupación Nacional: 9,8% (+1,3 pp)</option>
+          <option value="b335">Boletín N° 335 (Junio - Agosto 2026) · Desocupación Nacional: 9,6% (+1,0 pp)</option>
+          <option value="b334">Boletín N° 334 (Mayo - Julio 2026) · Desocupación Nacional: 9,5% (+0,8 pp)</option>
+          <option value="b333">Boletín ENE (Abril - Junio 2026) · Desocupación Nacional: 9,4% (+0,5 pp)</option>
+          <option value="b332">Boletín ENE (Marzo - Mayo 2026) · Desocupación Nacional: 9,4% (+0,5 pp)</option>
+        </select>
+      </div>
+
+      <div class="flex items-center gap-2 overflow-x-auto text-[11px] shrink-0">
+        <span class="bg-[#FAF7F2] px-2.5 py-1 rounded-lg border border-slate-200 text-slate-700 whitespace-nowrap">
+          Publicado: <strong id="metaPubDate" class="text-[#0D2847]">29 de octubre de 2026</strong>
+        </span>
+        <span class="bg-[#EAF4F7] px-2.5 py-1 rounded-lg border border-[#A5D8E2]/60 text-[#0D2847] whitespace-nowrap">
+          Participación: <strong id="metaPart">61,6%</strong> · Ocupación: <strong id="metaOcup">55,5%</strong>
+        </span>
+        <span class="bg-[#FAF7F2] px-2.5 py-1 rounded-lg border border-slate-200 text-[#0D2847] font-bold whitespace-nowrap">
+          Informalidad: <span id="metaInf">26,4%</span>
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="max-w-[1680px] mx-auto p-3 sm:p-5 md:p-7 space-y-5 md:space-y-6">
+
+    <!-- PÍLDORAS SUPERIORES DE LOS 5 NIVELES (Abren overlay encima de esta interfaz) -->
+    <div class="w-full flex items-center justify-between gap-2 md:gap-3 overflow-x-auto pb-1 select-none">
+      <button onclick="openLevelOverlay('atomos')" class="flex-1 min-w-[165px] flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-2xl bg-[#0D2847] hover:bg-[#12365e] text-white shadow-sm cursor-pointer text-left">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <span class="w-7 h-7 rounded-lg bg-white/15 flex items-center justify-center shrink-0">📊</span>
+          <div class="min-w-0">
+            <div class="text-xs sm:text-sm font-bold truncate">Átomos</div>
+            <div class="text-[10px] text-white/80 truncate">Las piezas mínimas</div>
+          </div>
+        </div>
+        <span class="px-2 py-0.5 rounded bg-white/15 text-[9px] font-bold text-[#A5D8E2]">Abrir ↗</span>
+      </button>
+      <span class="text-[#17859E] font-bold shrink-0">→</span>
+
+      <button onclick="openLevelOverlay('moleculas')" class="flex-1 min-w-[165px] flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-2xl bg-[#0D2847] hover:bg-[#12365e] text-white shadow-sm cursor-pointer text-left">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <span class="w-7 h-7 rounded-lg bg-white/15 flex items-center justify-center shrink-0">🔗</span>
+          <div class="min-w-0">
+            <div class="text-xs sm:text-sm font-bold truncate">Moléculas</div>
+            <div class="text-[10px] text-white/80 truncate">Átomos que trabajan juntos</div>
+          </div>
+        </div>
+        <span class="px-2 py-0.5 rounded bg-white/15 text-[9px] font-bold text-[#A5D8E2]">Abrir ↗</span>
+      </button>
+      <span class="text-[#17859E] font-bold shrink-0">→</span>
+
+      <button onclick="openLevelOverlay('organismos')" class="flex-1 min-w-[165px] flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-2xl bg-[#0D2847] hover:bg-[#12365e] text-white shadow-sm cursor-pointer text-left">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <span class="w-7 h-7 rounded-lg bg-white/15 flex items-center justify-center shrink-0">🗺️</span>
+          <div class="min-w-0">
+            <div class="text-xs sm:text-sm font-bold truncate">Organismos</div>
+            <div class="text-[10px] text-white/80 truncate">Secciones completas</div>
+          </div>
+        </div>
+        <span class="px-2 py-0.5 rounded bg-white/15 text-[9px] font-bold text-[#A5D8E2]">Abrir ↗</span>
+      </button>
+      <span class="text-[#17859E] font-bold shrink-0">→</span>
+
+      <button onclick="openLevelOverlay('plantillas')" class="flex-1 min-w-[165px] flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-2xl bg-[#0D2847] hover:bg-[#12365e] text-white shadow-sm cursor-pointer text-left">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <span class="w-7 h-7 rounded-lg bg-white/15 flex items-center justify-center shrink-0">📐</span>
+          <div class="min-w-0">
+            <div class="text-xs sm:text-sm font-bold truncate">Plantillas</div>
+            <div class="text-[10px] text-white/80 truncate">El esqueleto, sin contenido</div>
+          </div>
+        </div>
+        <span class="px-2 py-0.5 rounded bg-white/15 text-[9px] font-bold text-[#A5D8E2]">Abrir ↗</span>
+      </button>
+      <span class="text-[#17859E] font-bold shrink-0">→</span>
+
+      <button onclick="openLevelOverlay('paginas')" class="flex-1 min-w-[165px] flex items-center justify-between gap-2 px-3.5 py-2.5 rounded-2xl bg-[#17859E] hover:bg-[#147086] text-white shadow-sm cursor-pointer text-left">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <span class="w-7 h-7 rounded-lg bg-white/15 flex items-center justify-center shrink-0">📄</span>
+          <div class="min-w-0">
+            <div class="text-xs sm:text-sm font-bold truncate">Páginas</div>
+            <div class="text-[10px] text-white/80 truncate">La plantilla con datos reales</div>
+          </div>
+        </div>
+        <span class="px-2 py-0.5 rounded bg-white/15 text-[9px] font-bold text-[#A5D8E2]">Abrir ↗</span>
+      </button>
+    </div>
+
+    <!-- 5 COLUMNAS ATOMIC DESIGN (Sin botones "Argumentar uso:") -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4 items-stretch">
+
+      <!-- COLUMNA 1: ÁTOMOS -->
+      <div class="bg-[#FCFAF6] rounded-3xl p-5 border border-slate-200 flex flex-col justify-between space-y-4 shadow-sm">
+        <div class="space-y-4">
+          <div>
+            <div class="flex items-center justify-between mb-2.5">
+              <span class="text-xs font-bold text-[#0D2847]">🎨 Colores (tokens)</span>
+              <button onclick="openWhyModal('tokens-color')" class="text-[10px] text-[#17859E] hover:underline cursor-pointer">¿Por qué?</button>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+              <div onclick="copyHex('#0D2847', 'Primario')" class="flex flex-col items-center cursor-pointer group">
+                <div class="w-14 h-12 rounded-xl bg-[#0D2847] shadow-sm mb-1 group-hover:scale-105 transition-transform"></div>
+                <span class="text-[11px] font-semibold text-slate-700">Primario</span>
+                <span class="text-[9px] text-slate-400 font-mono">#0D2847</span>
+              </div>
+              <div onclick="copyHex('#17859E', 'Secundario')" class="flex flex-col items-center cursor-pointer group">
+                <div class="w-14 h-12 rounded-xl bg-[#17859E] shadow-sm mb-1 group-hover:scale-105 transition-transform"></div>
+                <span class="text-[11px] font-semibold text-slate-700">Secundario</span>
+                <span class="text-[9px] text-slate-400 font-mono">#17859E</span>
+              </div>
+              <div onclick="copyHex('#A5D8E2', 'Acento')" class="flex flex-col items-center cursor-pointer group">
+                <div class="w-14 h-12 rounded-xl bg-[#A5D8E2] shadow-sm mb-1 group-hover:scale-105 transition-transform"></div>
+                <span class="text-[11px] font-semibold text-slate-700">Acento</span>
+                <span class="text-[9px] text-slate-400 font-mono">#A5D8E2</span>
+              </div>
+            </div>
+            <div id="copyFeedback" class="text-[10px] text-center text-[#17859E] font-medium mt-1 hidden"></div>
+          </div>
+
+          <div class="pt-2 border-t border-slate-100">
+            <div class="text-xs font-bold text-[#0D2847] mb-1">Tipografía</div>
+            <div class="text-4xl font-extrabold text-[#0D2847] tracking-tight mb-0.5">Aa</div>
+            <div class="text-sm font-bold text-[#0D2847]">Nunito Sans</div>
+            <div class="text-xs text-slate-500">Suave, clara y legible</div>
+          </div>
+
+          <div class="pt-2 border-t border-slate-100">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-xs font-bold text-[#0D2847]">Botón de Acción</span>
+              <button onclick="openWhyModal('cambiar-region')" class="text-[10px] text-[#17859E] hover:underline cursor-pointer">¿Por qué?</button>
+            </div>
+            <button onclick="nextRegion()" class="w-full bg-[#0D2847] hover:bg-[#12365e] text-white py-2.5 px-4 rounded-full text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm">
+              <span>Cambiar región</span>
+              <span>→</span>
+            </button>
+          </div>
+
+          <div class="pt-2 border-t border-slate-100">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-xs font-bold text-[#0D2847]">Filtros Oficiales ENE</span>
+              <button onclick="openWhyModal('desglose-genero')" class="text-[10px] text-[#17859E] hover:underline cursor-pointer">¿Por qué?</button>
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <button id="btnModeGeneral" onclick="setDemoMode('general')" class="w-full py-1.5 px-3 rounded-xl text-xs font-semibold flex items-center justify-between cursor-pointer border bg-[#0D2847] text-white border-[#0D2847]">
+                <span>General (Total)</span><span class="text-[10px] font-mono opacity-80">País / Región</span>
+              </button>
+              <button id="btnModeGenero" onclick="setDemoMode('genero')" class="w-full py-1.5 px-3 rounded-xl text-xs font-semibold flex items-center justify-between cursor-pointer border bg-white text-slate-700 border-slate-200">
+                <span>Desglose por Sexo</span><span class="text-[10px] font-mono opacity-80">Mujeres / Hombres</span>
+              </button>
+              <button id="btnModeIndicadores" onclick="setDemoMode('indicadores')" class="w-full py-1.5 px-3 rounded-xl text-xs font-semibold flex items-center justify-between cursor-pointer border bg-white text-slate-700 border-slate-200">
+                <span>Indicadores ENE</span><span class="text-[10px] font-mono opacity-80">Part. / Ocup. / Inf.</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
+            <div>
+              <div class="text-xs font-bold text-[#0D2847] mb-1">Etiqueta</div>
+              <span onclick="openWhyModal('etiqueta-ine')" class="inline-flex items-center px-3.5 py-1 rounded-full border border-slate-300 bg-white text-xs font-bold text-[#0D2847] cursor-pointer">INE - ENE</span>
+            </div>
+            <div>
+              <div class="text-xs font-bold text-[#0D2847] mb-1">Glosario 2025</div>
+              <button onclick="openGlossaryModal()" class="text-[11px] font-semibold text-[#17859E] hover:underline cursor-pointer">ⓘ Definiciones</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-[10px] text-slate-500 pt-2 border-t border-slate-100 flex items-center justify-between">
+          <button onclick="openLevelOverlay('atomos')" class="text-[#17859E] hover:underline font-bold cursor-pointer">🔬 Abrir laboratorio de Átomos</button>
+          <span class="font-mono text-slate-400">Nivel 1</span>
+        </div>
+      </div>
+
+      <!-- COLUMNA 2: MOLÉCULAS -->
+      <div class="bg-[#FCFAF6] rounded-3xl p-5 border border-slate-200 flex flex-col justify-between space-y-4 shadow-sm">
+        <div class="space-y-4">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-[#0D2847]">📊 Tarjeta de cifra</span>
+              <span id="badgeDemoMode" class="text-[10px] font-bold text-[#17859E] bg-[#EAF4F7] px-2 py-0.5 rounded-full">Regional</span>
+            </div>
+            <div id="moleculeKpiCard" class="bg-[#EAF4F7] rounded-2xl p-4 border border-[#A5D8E2]/60 shadow-sm"></div>
+          </div>
+
+          <div class="pt-2 border-t border-slate-100">
+            <div class="flex items-center justify-between mb-1.5">
+              <span class="text-xs font-bold text-[#0D2847]">Selector de región</span>
+              <button onclick="openWhyModal('selector-region')" class="text-[10px] text-[#17859E] hover:underline cursor-pointer">¿Por qué?</button>
+            </div>
+            <select id="regionDropdown" onchange="selectRegion(this.value)" class="w-full bg-white border border-slate-300 rounded-full py-2 px-4 text-xs font-semibold text-[#0D2847] cursor-pointer"></select>
+          </div>
+
+          <div class="pt-2 border-t border-slate-100">
+            <div class="text-xs font-bold text-[#0D2847] mb-2">Leyenda del mapa</div>
+            <div class="w-full h-3 rounded-full bg-gradient-to-r from-[#A5D8E2] via-[#17859E] to-[#0D2847]"></div>
+            <div class="flex justify-between text-[11px] font-bold text-[#0D2847] mt-1.5 font-mono">
+              <span>4%</span><span>12%</span>
+            </div>
+          </div>
+
+          <div class="pt-2 border-t border-slate-100 space-y-1">
+            <div class="text-xs font-bold text-[#0D2847]">Línea de fuente & Glosario</div>
+            <p class="text-[11px] text-slate-600 leading-snug">Fuente: INE - Encuesta Nacional de Empleo 2026 y Glosario ENE 2025.</p>
+            <button onclick="openGlossaryModal()" class="text-[10px] font-bold text-[#17859E] hover:underline cursor-pointer">Consultar términos oficiales ENE 2025 →</button>
+          </div>
+        </div>
+
+        <div class="text-[10px] text-slate-500 pt-2 border-t border-slate-100 flex items-center justify-between">
+          <button onclick="openLevelOverlay('moleculas')" class="text-[#17859E] hover:underline font-bold cursor-pointer">🔬 Abrir laboratorio de Moléculas</button>
+          <span class="font-mono text-slate-400">Nivel 2</span>
+        </div>
+      </div>
+
+      <!-- COLUMNA 3: ORGANISMOS -->
+      <div class="bg-[#FCFAF6] rounded-3xl p-5 border border-slate-200 flex flex-col justify-between space-y-4 shadow-sm">
+        <div class="space-y-4">
+          <div>
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-[#0D2847]">📍 Ficha de tu región</span>
+              <span class="text-[10px] text-[#17859E] font-medium">Territorio</span>
+            </div>
+            <div id="organismRegionCard" class="bg-white rounded-2xl p-3.5 border border-slate-200 shadow-sm"></div>
+          </div>
+
+          <div class="pt-2 border-t border-slate-100">
+            <div class="text-xs font-bold text-[#0D2847] mb-2 flex items-center justify-between">
+              <span>Mapa de Chile <span class="text-[10px] font-bold text-[#17859E] bg-[#EAF4F7] px-1.5 py-0.5 rounded-full font-mono">16 regiones</span></span>
+              <span class="text-[9px] text-slate-400">Clic en región</span>
+            </div>
+            <div class="grid grid-cols-12 gap-2 items-center bg-[#FAF7F2]/60 p-2 rounded-2xl border border-slate-200/80">
+              <div class="col-span-6 flex justify-center py-1">
+                <svg id="chileMapSvg" viewBox="0 0 60 275" class="w-16 h-48 overflow-visible"></svg>
+              </div>
+              <div class="col-span-6 space-y-2 text-[10px]">
+                <div class="bg-white p-1.5 rounded-lg border border-slate-200">
+                  <div class="text-[9px] text-[#17859E] font-bold uppercase">Seleccionada:</div>
+                  <div id="mapSelName" class="font-bold text-[#0D2847] text-[11px] leading-tight">Región Metropolitana</div>
+                  <div id="mapSelRate" class="text-[10px] font-black text-[#17859E] font-mono">10,4% INE</div>
+                </div>
+                <div class="space-y-1 text-[9px] text-slate-600">
+                  <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-[#0D2847] inline-block"></span><span>≥ 11,5%</span></div>
+                  <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-[#12365e] inline-block"></span><span>10,0% – 11,4%</span></div>
+                  <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-[#17859E] inline-block"></span><span>8,5% – 9,9%</span></div>
+                  <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-[#A5D8E2] inline-block"></span><span>6,5% – 8,4%</span></div>
+                  <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-[#C8EBF2] border border-slate-200 inline-block"></span><span>&lt; 6,5%</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-[10px] text-slate-500 pt-2 border-t border-slate-100 flex items-center justify-between">
+          <button onclick="openLevelOverlay('organismos')" class="text-[#17859E] hover:underline font-bold cursor-pointer">🔬 Abrir laboratorio de Organismos</button>
+          <span class="font-mono text-slate-400">Nivel 3</span>
+        </div>
+      </div>
+
+      <!-- COLUMNA 4: PLANTILLAS -->
+      <div class="bg-[#FCFAF6] rounded-3xl p-5 border border-slate-200 flex flex-col justify-between space-y-4 shadow-sm">
+        <div class="space-y-4">
+          <div>
+            <div class="flex items-center justify-between mb-2.5">
+              <span class="text-xs font-bold text-[#0D2847]">🪟 Minimapa</span>
+              <span class="text-[10px] text-slate-500 font-mono">Layout</span>
+            </div>
+            <div class="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-col items-center">
+              <div class="relative w-full h-44 flex items-center justify-center py-1">
+                <svg viewBox="0 0 70 150" class="h-full">
+                  <path d="M28,8 Q34,18 31,35 Q28,55 24,80 Q20,110 26,142 Q19,136 17,115 Q18,85 22,50 Q24,25 24,8 Z" fill="#17859E" opacity="0.9"/>
+                  <circle cx="23" cy="65" r="4.5" fill="#0D2847" stroke="#FFFFFF" stroke-width="2"/>
+                  <line x1="26" y1="65" x2="44" y2="65" stroke="#0D2847" stroke-width="1.5"/>
+                </svg>
+                <div class="absolute right-1 top-[35%] bg-[#EAF4F7] border border-[#A5D8E2] rounded-xl px-2.5 py-1.5 text-center shadow-sm">
+                  <div id="miniTag" class="text-[10px] font-bold text-[#0D2847]">RM</div>
+                  <div id="miniRate" class="text-xs font-extrabold text-[#0D2847] font-mono">10,4%</div>
+                </div>
+              </div>
+              <div class="text-center mt-2 w-full">
+                <div id="miniTitle" class="text-xs font-bold text-[#0D2847]">Región Metropolitana</div>
+                <div id="miniDesc" class="text-xs text-slate-600 mt-0.5">Presenta una tasa de desocupación de 10,4%.</div>
+              </div>
+              <button onclick="nextRegion()" class="mt-3.5 w-full bg-[#EAF4F7] hover:bg-[#d8eef5] rounded-xl p-2.5 flex items-center gap-2 border border-[#A5D8E2]/50 text-left cursor-pointer">
+                <span class="w-5 h-5 rounded-full bg-[#17859E] text-white flex items-center justify-center shrink-0 text-[10px] font-bold">i</span>
+                <span class="text-[10px] text-slate-700 leading-tight">Haz clic para recorrer las 16 regiones de Chile.</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-[10px] text-slate-500 pt-2 border-t border-slate-100 flex items-center justify-between">
+          <button onclick="openLevelOverlay('plantillas')" class="text-[#17859E] hover:underline font-bold cursor-pointer">🔬 Abrir laboratorio de Plantillas</button>
+          <span class="font-mono text-slate-400">Nivel 4</span>
+        </div>
+      </div>
+
+      <!-- COLUMNA 5: PÁGINAS -->
+      <div class="bg-[#FCFAF6] rounded-3xl p-4 sm:p-5 border border-slate-200 flex flex-col justify-between space-y-4 shadow-sm overflow-hidden box-border">
+        <div class="space-y-4 w-full max-w-full overflow-hidden">
+          <div class="w-full max-w-full overflow-hidden">
+            <div class="flex items-center justify-between mb-2.5">
+              <span class="text-xs font-bold text-[#0D2847]">📄 Página principal</span>
+              <span class="text-[9px] bg-[#17859E] text-white px-2 py-0.5 rounded font-mono">INE 2026</span>
+            </div>
+
+            <div class="bg-white rounded-2xl p-3 sm:p-3.5 border border-slate-200 shadow-sm space-y-2.5 overflow-hidden w-full max-w-full box-border">
+              <div class="w-full bg-[#0D2847] text-white py-2 px-3 rounded-full text-center text-xs font-bold">
+                Observatorio Laboral
+              </div>
+
+              <div class="flex items-center justify-center gap-1 bg-[#FAF7F2] p-1 rounded-xl border border-slate-200 text-[10px]">
+                <button id="pageTabGeneral" onclick="setDemoMode('general')" class="flex-1 py-1 px-2 rounded-lg font-bold cursor-pointer bg-[#0D2847] text-white">Total</button>
+                <button id="pageTabGenero" onclick="setDemoMode('genero')" class="flex-1 py-1 px-2 rounded-lg font-bold cursor-pointer text-slate-600">Sexo</button>
+                <button id="pageTabIndicadores" onclick="setDemoMode('indicadores')" class="flex-1 py-1 px-1.5 rounded-lg font-bold cursor-pointer text-slate-600">ENE 2026</button>
+              </div>
+
+              <div id="pageMainStat" class="text-center pt-2 pb-1"></div>
+              <div id="pageChartContainer" class="my-2.5 p-2 sm:p-2.5 bg-[#FAF7F2]/90 rounded-xl border border-slate-200/90 w-full max-w-full overflow-hidden box-border"></div>
+
+              <div id="pageSourceLine" class="text-center pt-2 pb-1 border-t border-slate-100 text-[10px] text-slate-500 font-medium"></div>
+
+              <div class="mt-2 bg-[#EAF4F7] rounded-xl p-3 flex items-center gap-2.5 border border-[#A5D8E2]/60 text-left">
+                <div class="w-8 h-8 rounded-full bg-white border border-[#A5D8E2] flex items-center justify-center text-[#17859E] shrink-0">💡</div>
+                <p class="text-[11px] text-slate-700 leading-snug font-medium">
+                  Cifras oficiales 2026 del INE y definiciones del Glosario ENE 2025 en lenguaje claro.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-[10px] text-slate-500 pt-2 border-t border-slate-100 flex items-center justify-between">
+          <button onclick="openLevelOverlay('paginas')" class="text-[#17859E] hover:underline font-bold cursor-pointer">🔬 Abrir laboratorio de Páginas</button>
+          <span class="font-mono text-slate-400">Nivel 5</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SECCIÓN INFERIOR RESTAURADA DE LA CAPTURA DE PANTALLA -->
+    <section class="space-y-5 pt-2">
+      <div class="bg-white rounded-3xl border border-slate-200/90 p-5 sm:p-6 shadow-sm">
+        <h3 class="text-xs font-extrabold uppercase tracking-[0.14em] text-[#455A75] mb-4">
+          CRITERIOS TRANSVERSALES DE DESARROLLO
+        </h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+          <div class="bg-[#FAF7F2] rounded-2xl border border-slate-200/80 p-4 flex items-start gap-3">
+            <span class="w-7 h-7 rounded-lg bg-[#EAF4F7] border border-[#A5D8E2]/60 flex items-center justify-center shrink-0">📈</span>
+            <div>
+              <h4 class="text-xs font-extrabold text-[#0D2847]">Estados</h4>
+              <p class="text-xs text-slate-600 leading-snug mt-0.5">Carga, error, foco interactivo y ausencia de datos.</p>
+            </div>
+          </div>
+          <div class="bg-[#FAF7F2] rounded-2xl border border-slate-200/80 p-4 flex items-start gap-3">
+            <span class="w-7 h-7 rounded-lg bg-[#EAF4F7] border border-[#A5D8E2]/60 flex items-center justify-center shrink-0">🗄️</span>
+            <div>
+              <h4 class="text-xs font-extrabold text-[#0D2847]">Datos y voz</h4>
+              <p class="text-xs text-slate-600 leading-snug mt-0.5">Formato homogéneo, fechas INE y lenguaje cívico.</p>
+            </div>
+          </div>
+          <div class="bg-[#FAF7F2] rounded-2xl border border-slate-200/80 p-4 flex items-start gap-3">
+            <span class="w-7 h-7 rounded-lg bg-[#17859E] text-white flex items-center justify-center shrink-0">♿</span>
+            <div>
+              <h4 class="text-xs font-extrabold text-[#0D2847]">Accesibilidad</h4>
+              <p class="text-xs text-slate-600 leading-snug mt-0.5">Contraste WCAG AA, legibilidad tipográfica y navegación.</p>
+            </div>
+          </div>
+          <div class="bg-[#FAF7F2] rounded-2xl border border-slate-200/80 p-4 flex items-start gap-3">
+            <span class="w-7 h-7 rounded-lg bg-[#EAF4F7] border border-[#A5D8E2]/60 flex items-center justify-center shrink-0">🤖</span>
+            <div>
+              <h4 class="text-xs font-extrabold text-[#0D2847]">Inteligencia Artificial</h4>
+              <p class="text-xs text-slate-600 leading-snug mt-0.5">Fundamentada exclusivamente en fuentes oficiales del INE.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="w-full bg-[#0A2540] text-white rounded-3xl py-8 sm:py-10 px-6 text-center shadow-sm">
+        <h2 class="text-xl sm:text-2xl md:text-[28px] font-extrabold text-white tracking-tight leading-snug">
+          Democratizar el acceso a las estadísticas del desempleo.
+        </h2>
+        <p class="text-xs sm:text-sm text-[#B8D4E8] mt-1.5 font-medium">
+          Una experiencia digital clara, confiable y accesible para toda la ciudadanía.
+        </p>
+      </div>
+
+      <footer class="border-t border-slate-200/80 pt-3.5 pb-6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
+        <div><strong class="text-[#0D2847]">Observatorio Laboral</strong> · Proyecto de Periodismo & Diseño Digital</div>
+        <div>Basado en metodología Atomic Design de Brad Frost · INE Chile 2026</div>
+      </footer>
+    </section>
+
+  </main>
+
+  <!-- OVERLAY SOBRE LA MISMA INTERFAZ: LABORATORIO ATÓMICO -->
+  <div id="levelOverlay" class="no-print hidden fixed inset-0 z-50 bg-[#0D2847]/75 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 md:p-6 overflow-y-auto" onclick="closeLevelOverlay()">
+    <div class="bg-[#FAF7F2] rounded-3xl max-w-[1440px] w-full max-h-[92vh] flex flex-col shadow-2xl border border-slate-300 overflow-hidden" onclick="event.stopPropagation()">
+      <div class="bg-[#0D2847] text-white px-5 py-3.5 border-b border-[#17859E]/40 flex items-center justify-between gap-3">
+        <div>
+          <span class="text-[10px] font-mono font-bold uppercase tracking-wider text-[#A5D8E2] block">
+            Laboratorio Atómico Interactivo · Vista sobre la misma interfaz
+          </span>
+          <h2 id="overlayTitle" class="text-base sm:text-lg font-black text-white">Nivel Átomos</h2>
+        </div>
+        <button onclick="closeLevelOverlay()" class="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs border border-white/25 cursor-pointer">
+          ✕ Cerrar vista
+        </button>
+      </div>
+
+      <div id="overlayTabs" class="bg-white border-b border-slate-200 px-5 py-2 flex items-center gap-2 overflow-x-auto"></div>
+      <div id="overlayBody" class="flex-1 overflow-y-auto p-5 md:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 items-start"></div>
+    </div>
+  </div>
+
+  <!-- OVERLAY: GLOSARIO ENE 2025 -->
+  <div id="glossaryModal" class="no-print hidden fixed inset-0 z-50 bg-[#0D2847]/75 backdrop-blur-sm flex items-center justify-center p-3 md:p-6 overflow-y-auto" onclick="closeGlossaryModal()">
+    <div class="bg-[#FAF7F2] rounded-3xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl border border-slate-300 overflow-hidden" onclick="event.stopPropagation()">
+      <div class="bg-[#0D2847] text-white p-5 flex items-center justify-between border-b border-[#17859E]/40">
+        <div>
+          <span class="text-[10px] font-bold uppercase tracking-wider text-[#A5D8E2]">Documento Metodológico INE Chile</span>
+          <h2 class="text-lg font-black">Glosario Encuesta Nacional de Empleo (ENE 2025)</h2>
+        </div>
+        <button onclick="closeGlossaryModal()" class="p-2 rounded-xl text-slate-300 hover:text-white cursor-pointer">✕</button>
+      </div>
+      <div id="glossaryContent" class="p-5 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-3.5"></div>
+    </div>
+  </div>
+
+  <!-- OVERLAY: ¿POR QUÉ CADA BOTÓN? -->
+  <div id="whyModal" class="no-print hidden fixed inset-0 z-50 bg-[#0D2847]/75 backdrop-blur-sm flex items-center justify-center p-3 md:p-6 overflow-y-auto" onclick="closeWhyModal()">
+    <div class="bg-[#FAF7F2] rounded-3xl max-w-3xl w-full max-h-[88vh] flex flex-col shadow-2xl border border-slate-300 overflow-hidden" onclick="event.stopPropagation()">
+      <div class="bg-[#0D2847] text-white p-5 flex items-center justify-between border-b border-[#17859E]/40">
+        <h2 class="text-lg font-black">Fundamentación de Botones e Interacción</h2>
+        <button onclick="closeWhyModal()" class="p-2 rounded-xl text-slate-300 hover:text-white cursor-pointer">✕</button>
+      </div>
+      <div id="whyContent" class="p-5 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-3.5"></div>
+    </div>
+  </div>
+
+  <script>
+    const REGIONS_META = [
+      { id: 'arica', name: 'Arica y Parinacota', num: 'XV', d: 'M25,4 L39,6 L38,18 L25,16 Z', cx: 31, cy: 11 },
+      { id: 'tarapaca', name: 'Tarapacá', num: 'I', d: 'M25,18 L38,20 L37,34 L24,32 Z', cx: 30, cy: 26 },
+      { id: 'antofagasta', name: 'Antofagasta', num: 'II', d: 'M24,34 L37,36 L35,53 L23,50 Z', cx: 29, cy: 44 },
+      { id: 'atacama', name: 'Atacama', num: 'III', d: 'M23,53 L35,55 L33,70 L22,67 Z', cx: 28, cy: 62 },
+      { id: 'coquimbo', name: 'Coquimbo', num: 'IV', d: 'M22,70 L33,72 L31,87 L21,85 Z', cx: 27, cy: 79 },
+      { id: 'valpo', name: 'Valparaíso', num: 'V', d: 'M21,87 L28,89 L27,101 L20,99 Z', cx: 24, cy: 94 },
+      { id: 'rm', name: 'Región Metropolitana', num: 'RM', d: 'M28,89 L36,91 L35,102 L27,101 Z', cx: 31, cy: 95 },
+      { id: 'ohiggins', name: "O'Higgins", num: 'VI', d: 'M20,101 L35,102 L33,115 L19,113 Z', cx: 27, cy: 108 },
+      { id: 'maule', name: 'Maule', num: 'VII', d: 'M19,115 L33,117 L31,130 L18,128 Z', cx: 25, cy: 122 },
+      { id: 'nuble', name: 'Ñuble', num: 'XVI', d: 'M18,130 L31,132 L30,143 L17,141 Z', cx: 24, cy: 136 },
+      { id: 'biobio', name: 'Biobío', num: 'VIII', d: 'M17,143 L30,145 L28,157 L16,155 Z', cx: 23, cy: 150 },
+      { id: 'araucania', name: 'La Araucanía', num: 'IX', d: 'M16,157 L28,159 L27,172 L15,170 Z', cx: 22, cy: 165 },
+      { id: 'losrios', name: 'Los Ríos', num: 'XIV', d: 'M15,172 L27,174 L26,187 L14,185 Z', cx: 21, cy: 179 },
+      { id: 'loslagos', name: 'Los Lagos', num: 'X', d: 'M14,187 L26,189 L28,208 L19,211 L13,202 Z', cx: 20, cy: 199 },
+      { id: 'aysen', name: 'Aysén', num: 'XI', d: 'M15,210 L28,212 L25,234 L14,231 L17,223 Z', cx: 21, cy: 222 },
+      { id: 'magallanes', name: 'Magallanes', num: 'XII', d: 'M14,234 L25,236 L29,258 L19,270 L10,256 L13,246 Z', cx: 20, cy: 252 }
+    ];
+
+    const INE_2026_BULLETINS = {
+      b336: {
+        label: 'Boletín N° 336', quarter: 'Julio - Septiembre 2026', shortQuarter: 'Jul - Sep 2026', pubDate: '29 de octubre de 2026',
+        nationalRate: 9.8, nationalDelta: 1.3, partRate: 61.6, ocupRate: 55.5, infRate: 26.4,
+        mujeres: { rate: 10.5, delta: 1.4 }, hombres: { rate: 9.3, delta: 1.2 },
+        summary: 'En julio - septiembre de 2026 la desocupación nacional fue 9,8% (+1,3 pp en 12 meses). Ocupados: 9.274.742 (-1,1%); desocupados: 1.007.976 (+15,3%). Mujeres 10,5%, hombres 9,3%.',
+        regions: {
+          arica:{r:7.8,d:null}, tarapaca:{r:8.5,d:null}, antofagasta:{r:6.7,d:null}, atacama:{r:8.8,d:null},
+          coquimbo:{r:9.0,d:null}, valpo:{r:9.9,d:null}, rm:{r:10.4,d:null}, ohiggins:{r:10.9,d:null},
+          maule:{r:9.7,d:2.2}, nuble:{r:11.8,d:null}, biobio:{r:10.5,d:null}, araucania:{r:9.4,d:null},
+          losrios:{r:9.8,d:null}, loslagos:{r:7.7,d:2.2}, aysen:{r:4.0,d:-0.7}, magallanes:{r:6.4,d:-0.1}
+        }
+      },
+      b335: {
+        label: 'Boletín N° 335', quarter: 'Junio - Agosto 2026', shortQuarter: 'Jun - Ago 2026', pubDate: '30 de septiembre de 2026',
+        nationalRate: 9.6, nationalDelta: 1.0, partRate: 61.5, ocupRate: 55.6, infRate: 26.3,
+        mujeres: { rate: 10.3, delta: 1.0 }, hombres: { rate: 9.1, delta: 1.1 },
+        summary: 'En junio - agosto de 2026 la tasa nacional fue 9,6% (+1,0 pp). Mujeres 10,3% (+1,0 pp), hombres 9,1% (+1,1 pp). Informalidad laboral: 26,3% (2.440.977 personas).',
+        regions: {
+          arica:{r:9.4,d:2.7}, tarapaca:{r:7.8,d:0.8}, antofagasta:{r:null,d:null}, atacama:{r:9.5,d:0.2},
+          coquimbo:{r:9.4,d:1.8}, valpo:{r:10.2,d:null}, rm:{r:9.8,d:null}, ohiggins:{r:10.8,d:2.2},
+          maule:{r:9.5,d:1.6}, nuble:{r:11.2,d:null}, biobio:{r:10.7,d:null}, araucania:{r:10.1,d:null},
+          losrios:{r:10.2,d:1.1}, loslagos:{r:7.8,d:2.8}, aysen:{r:4.0,d:null}, magallanes:{r:6.9,d:null}
+        }
+      },
+      b334: {
+        label: 'Boletín N° 334', quarter: 'Mayo - Julio 2026', shortQuarter: 'May - Jul 2026', pubDate: '28 de agosto de 2026',
+        nationalRate: 9.5, nationalDelta: 0.8, partRate: 61.7, ocupRate: 55.9, infRate: 26.5,
+        mujeres: { rate: 10.3, delta: 0.6 }, hombres: { rate: 8.9, delta: 1.0 },
+        summary: 'En mayo - julio de 2026 la desocupación alcanzó 9,5% (+0,8 pp en 12 meses). Mujeres 10,3%, hombres 8,9%. Ocupación informal: 26,5%.',
+        regions: {
+          arica:{r:10.0,d:null}, tarapaca:{r:7.8,d:null}, antofagasta:{r:6.5,d:-0.2}, atacama:{r:9.1,d:null},
+          coquimbo:{r:9.5,d:2.5}, valpo:{r:10.4,d:1.8}, rm:{r:9.5,d:0.3}, ohiggins:{r:10.5,d:1.3},
+          maule:{r:null,d:null}, nuble:{r:11.0,d:null}, biobio:{r:10.6,d:null}, araucania:{r:10.0,d:0.8},
+          losrios:{r:10.6,d:null}, loslagos:{r:7.7,d:null}, aysen:{r:4.0,d:null}, magallanes:{r:5.9,d:null}
+        }
+      },
+      b333: {
+        label: 'Boletín ENE · Abr-Jun', quarter: 'Abril - Junio 2026', shortQuarter: 'Abr - Jun 2026', pubDate: '31 de julio de 2026',
+        nationalRate: 9.4, nationalDelta: 0.5, partRate: 62.3, ocupRate: 56.4, infRate: 27.0,
+        mujeres: { rate: 10.4, delta: 0.5 }, hombres: { rate: 8.7, delta: 0.6 },
+        summary: 'En abril - junio de 2026 la desocupación fue 9,4% (+0,5 pp). Fuerza de trabajo: 10.383.568; ocupados: 9.403.299; desocupados: 980.270. Incorporación coyuntural de CISO-18.',
+        regions: {
+          arica:{r:null,d:null}, tarapaca:{r:null,d:null}, antofagasta:{r:null,d:null}, atacama:{r:null,d:null},
+          coquimbo:{r:null,d:null}, valpo:{r:10.4,d:1.8}, rm:{r:9.4,d:-0.1}, ohiggins:{r:null,d:null},
+          maule:{r:null,d:null}, nuble:{r:10.5,d:0.0}, biobio:{r:null,d:null}, araucania:{r:null,d:null},
+          losrios:{r:null,d:null}, loslagos:{r:null,d:null}, aysen:{r:null,d:null}, magallanes:{r:null,d:null}
+        }
+      },
+      b332: {
+        label: 'Boletín ENE · Mar-May', quarter: 'Marzo - Mayo 2026', shortQuarter: 'Mar - May 2026', pubDate: 'Fines de junio de 2026',
+        nationalRate: 9.4, nationalDelta: 0.5, partRate: 62.4, ocupRate: 56.5, infRate: 23.4,
+        mujeres: { rate: 10.5, delta: 0.4 }, hombres: { rate: 8.6, delta: 0.5 },
+        summary: 'En marzo - mayo de 2026 la desocupación fue 9,4% (+0,5 pp). Mujeres 10,5%, hombres 8,6%. Participación 62,4%, ocupación 56,5%.',
+        regions: {
+          arica:{r:null,d:null}, tarapaca:{r:null,d:null}, antofagasta:{r:null,d:null}, atacama:{r:null,d:null},
+          coquimbo:{r:null,d:null}, valpo:{r:10.2,d:1.3}, rm:{r:9.8,d:0.3}, ohiggins:{r:null,d:null},
+          maule:{r:null,d:null}, nuble:{r:null,d:null}, biobio:{r:null,d:null}, araucania:{r:null,d:null},
+          losrios:{r:null,d:null}, loslagos:{r:null,d:null}, aysen:{r:null,d:null}, magallanes:{r:null,d:null}
+        }
+      }
+    };
+
+    const TREND_2026 = [
+      { label: 'Feb-Abr', rate: 9.1 }, { label: 'Mar-May', rate: 9.4 },
+      { label: 'Abr-Jun', rate: 9.4 }, { label: 'May-Jul', rate: 9.5 },
+      { label: 'Jun-Ago', rate: 9.6 }, { label: 'Jul-Sep', rate: 9.8 }
+    ];
+
+    const ENE_GLOSSARY_2025 = [
+      { term: 'Población en Edad de Trabajar (PET)', def: 'Personas residentes habituales en Chile de 15 años y más, sin distinción de actividad económica.' },
+      { term: 'Fuerza de Trabajo (PEA)', def: 'Personas en edad de trabajar que durante la semana de referencia son ocupadas o desocupadas.', formula: 'FT = Ocupados + Desocupados' },
+      { term: 'Personas Ocupadas', def: 'Personas de 15 años y más que trabajaron al menos una hora por remuneración, ganancia o beneficio familiar, o estaban ausentes temporalmente.' },
+      { term: 'Personas Desocupadas', def: 'Sin empleo en la semana de referencia, buscaron activamente en las últimas 4 semanas y disponibles para trabajar en 2 semanas. Incluye cesantes y quienes buscan por primera vez.' },
+      { term: 'Fuera de la Fuerza de Trabajo / Iniciadores', def: 'Inactivos de 15+ años (estudiantes, jubilados, cuidados). Los iniciadores disponibles comenzarán pronto una labor y están disponibles.' },
+      { term: 'Tasa de Desocupación (TD)', def: 'Porcentaje de personas desocupadas respecto de la Fuerza de Trabajo.', formula: 'TD = (Desocupados / Fuerza de Trabajo) × 100' },
+      { term: 'Ocupación Informal y Sector Informal', def: 'Dependientes sin cotizaciones de salud/previsión por vínculo laboral; independientes en sector informal (sin SII ni contabilidad separada); y familiares no remunerados.' },
+      { term: 'Categoría en la Ocupación (CISO-18)', def: 'Clasificación internacional (20ª CIET-OIT) incorporada coyunturalmente desde Abr-Jun 2026: Empleador/a, Cuenta propia, Contratista dependiente, Asalariado privado/público, Servicio doméstico y Familiar no remunerado.' },
+      { term: 'Subutilización (SU1, SU2, SU3)', def: 'SU1 agrega iniciadores disponibles; SU2 suma tiempo parcial involuntario; SU3 incorpora fuerza de trabajo potencial.' }
+    ];
+
+    const LEVEL_DOCS = {
+      atomos: {
+        title: 'Nivel 1 · Átomos',
+        initial: 'Cada elemento tiene una función reconocible y facilita la interacción.',
+        functional: 'Unidades irreducibles (tokens de color, tipografía Nunito Sans, botones, etiquetas INE - ENE) diseñadas con relación unívoca entre forma y función.',
+        visual: ['Contraste 13.8:1 (#0D2847 s/ #FAF7F2) WCAG AAA.', 'Coma decimal chilena (9,8%) y unidad explícita en puntos porcentuales (pp).', 'Áreas táctiles ≥44px.'],
+        civic: 'Elimina barreras cognitivas y evita errores periodísticos entre porcentajes y puntos porcentuales.',
+        stats: 'TD_t − TD_{t-12} se expresa en "pp". Si un dato no aparece en síntesis se muestra estado transparente sin inventar.'
+      },
+      moleculas: {
+        title: 'Nivel 2 · Moléculas',
+        initial: 'Combinar elementos para transformar estadísticas técnicas en información fácil de interpretar.',
+        functional: 'Articula cifra puntual, variación en pp, trimestre móvil, selector regional y términos del Glosario ENE 2025 en una sola tarjeta.',
+        visual: ['Contenedor Cielo Pastel (#EAF4F7) para aislar métricas clave.', 'Escala coroplética de 4% a 12% calibrada a datos 2026.', 'Pie de fuente inseparable.'],
+        civic: 'Evita capturas descontextualizadas y vincula cada indicador con la definición exacta del Glosario ENE 2025.',
+        stats: 'Tasa de Desocupación = (Desocupados / Fuerza de Trabajo) × 100 · Tasa de Participación = (FT / PET) × 100.'
+      },
+      organismos: {
+        title: 'Nivel 3 · Organismos',
+        initial: 'Organizar la información en secciones completas que permitan comparar la realidad laboral de los distintos territorios.',
+        functional: 'Conecta la ficha territorial con el mapa coroplético de las 16 regiones oficiales de Chile para contrastar brechas locales frente al país.',
+        visual: ['16 regiones vectoriales interactivas con pinpoint.', 'Paleta azulada sin rojo alarmista.', 'Estado neutro gris cuando un reporte no desglosa regiones.'],
+        civic: 'Combate el centralismo metropolitano visibilizando regiones desde Arica y Parinacota hasta Magallanes.',
+        stats: 'Criterio INE de calidad muestral: Coeficiente de Variación (CV) < 15% para estimaciones fiables por dominio regional.'
+      },
+      plantillas: {
+        title: 'Nivel 4 · Plantillas',
+        initial: 'Estructura vacía y adaptable a dispositivos móviles y computadores, construyendo una plataforma escalable y consistente.',
+        functional: 'Desacopla la grilla responsive y la ubicación del selector de boletines del contenido mensual de la ENE.',
+        visual: ['Selector de boletines bajo la barra azul para lectura óptima en móvil.', 'Contenedores estables que previenen saltos de diseño.', 'Diseño tolerante a datos nulos (null-safe).'],
+        civic: 'Asegura equidad tecnológica entre smartphones de gama básica y computadores.',
+        stats: 'Esquema preparado para absorber nuevas dimensiones metodológicas como CISO-18 sin alterar el diseño.'
+      },
+      paginas: {
+        title: 'Nivel 5 · Páginas',
+        initial: 'Incorporación de datos reales del INE, garantizando una plataforma escalable, consistente y fácil de actualizar.',
+        functional: 'Integra los 5 últimos boletines reales de 2026 (Marzo-Mayo a Julio-Septiembre 2026) y el Glosario ENE 2025.',
+        visual: ['Serie gráfica de 6 trimestres móviles 2026 contenida dentro de márgenes.', 'Filtros de Total, Sexo y Tasas ENE.', 'Criterios transversales y cierre ciudadano.'],
+        civic: 'Transforma los reportes oficiales de 2026 en conocimiento cívico verificable.',
+        stats: 'Serie real 2026: Feb-Abr 9,1% → Mar-May 9,4% → Abr-Jun 9,4% → May-Jul 9,5% → Jun-Ago 9,6% → Jul-Sep 9,8%.'
+      }
+    };
+
+    const WHY_BUTTONS = [
+      { name: 'Cambiar región →', cat: 'Acción', desc: 'Recorre las 16 regiones de Chile sin sesgo metropolitano.' },
+      { name: 'Desglose por Sexo', cat: 'Demográfico', desc: 'Muestra la brecha entre mujeres (10,5%) y hombres (9,3%) en 2026.' },
+      { name: 'Indicadores ENE', cat: 'Estadístico', desc: 'Expone Participación, Ocupación e Informalidad del mismo boletín.' },
+      { name: 'Glosario ENE 2025', cat: 'Metodología', desc: 'Aclara definiciones oficiales del INE (PET, FT, Ocupación Informal, CISO-18).' }
+    ];
+
+    let currentBulletinId = 'b336';
+    let currentRegionId = 'rm';
+    let currentDemoMode = 'general';
+    let currentOverlayLevel = 'atomos';
+
+    const fmt = (n) => n.toFixed(1).replace('.', ',');
+    const getColor = (rate, sel) => {
+      if (sel) return '#0D2847';
+      if (rate === null) return '#CBD5E1';
+      if (rate >= 11.5) return '#0D2847';
+      if (rate >= 10.0) return '#12365e';
+      if (rate >= 8.5) return '#17859E';
+      if (rate >= 6.5) return '#A5D8E2';
+      return '#C8EBF2';
+    };
+
+    function renderAll() {
+      const b = INE_2026_BULLETINS[currentBulletinId];
+      const regMeta = REGIONS_META.find(r => r.id === currentRegionId) || REGIONS_META[6];
+      const regPt = b.regions[currentRegionId] || { r: null, d: null };
+
+      document.getElementById('metaPubDate').textContent = b.pubDate;
+      document.getElementById('metaPart').textContent = fmt(b.partRate) + '%';
+      document.getElementById('metaOcup').textContent = fmt(b.ocupRate) + '%';
+      document.getElementById('metaInf').textContent = fmt(b.infRate) + '%';
+
+      // Dropdown
+      const dd = document.getElementById('regionDropdown');
+      dd.innerHTML = REGIONS_META.map(r => {
+        const pt = b.regions[r.id];
+        const labelRate = pt && pt.r !== null ? `${fmt(pt.r)}%` : 'Tabulado';
+        return `<option value="${r.id}" ${r.id === currentRegionId ? 'selected' : ''}>${r.name} (${labelRate})</option>`;
+      }).join('');
+
+      // Buttons mode styles
+      ['General', 'Genero', 'Indicadores'].forEach(k => {
+        const idKey = k.toLowerCase();
+        const b1 = document.getElementById('btnMode' + k);
+        const b2 = document.getElementById('pageTab' + k);
+        const active = currentDemoMode === idKey;
+        if (b1) {
+          b1.className = `w-full py-1.5 px-3 rounded-xl text-xs font-semibold flex items-center justify-between cursor-pointer border ${active ? (idKey === 'general' ? 'bg-[#0D2847] text-white border-[#0D2847]' : 'bg-[#17859E] text-white border-[#17859E]') : 'bg-white text-slate-700 border-slate-200'}`;
+        }
+        if (b2) {
+          b2.className = `flex-1 py-1 px-2 rounded-lg font-bold cursor-pointer ${active ? (idKey === 'general' ? 'bg-[#0D2847] text-white' : 'bg-[#17859E] text-white') : 'text-slate-600'}`;
+        }
+      });
+
+      document.getElementById('badgeDemoMode').textContent =
+        currentDemoMode === 'general' ? 'Regional' : currentDemoMode === 'genero' ? 'Sexo' : 'ENE 2026';
+
+      // Molecule KPI
+      const mk = document.getElementById('moleculeKpiCard');
+      if (currentDemoMode === 'general') {
+        mk.innerHTML = `
+          <div class="text-xs font-medium text-slate-700 mb-1">Tasa de desocupación · ${regMeta.name}</div>
+          ${regPt.r !== null
+            ? `<div class="text-4xl font-extrabold text-[#0D2847]">${fmt(regPt.r)}%</div>
+               <div class="text-xs font-bold text-[#17859E] mt-1">${regPt.d !== null ? (regPt.d > 0 ? '▲ +' : '▼ ') + fmt(regPt.d) + ' pp en 12 meses' : 'Nacional: ' + fmt(b.nationalRate) + '% (+' + fmt(b.nationalDelta) + ' pp)'}</div>`
+            : `<div class="text-lg font-extrabold text-[#0D2847]">Ver tabulado regional INE</div>
+               <div class="text-[11px] text-slate-600 mt-1">Nacional: <strong>${fmt(b.nationalRate)}%</strong> (+${fmt(b.nationalDelta)} pp)</div>`}
+          <div class="mt-3 pt-2 border-t border-[#A5D8E2]/60 text-[10px] text-slate-600 flex justify-between">
+            <span>Fuente: INE, ENE</span><span class="font-mono text-[#17859E]">${b.shortQuarter}</span>
+          </div>`;
+      } else if (currentDemoMode === 'genero') {
+        const gap = fmt(b.mujeres.rate - b.hombres.rate);
+        mk.innerHTML = `
+          <div class="text-xs font-bold text-slate-700 mb-2">Desocupación por Sexo · Chile</div>
+          <div class="grid grid-cols-2 gap-2 mb-2">
+            <div class="bg-white p-2 rounded-xl border border-[#A5D8E2]/50"><span class="text-[10px] text-slate-500 font-bold block">MUJERES</span><span class="text-xl font-black text-[#0D2847]">${fmt(b.mujeres.rate)}%</span></div>
+            <div class="bg-white p-2 rounded-xl border border-[#A5D8E2]/50"><span class="text-[10px] text-slate-500 font-bold block">HOMBRES</span><span class="text-xl font-black text-[#0D2847]">${fmt(b.hombres.rate)}%</span></div>
+          </div>
+          <div class="text-[10px] font-bold bg-white/80 px-2 py-1 rounded">Brecha: +${gap} pp en mujeres</div>`;
+      } else {
+        mk.innerHTML = `
+          <div class="text-xs font-bold text-slate-700 mb-2">Tasas ENE 2026 · Chile</div>
+          <div class="space-y-1 text-xs">
+            <div class="flex justify-between bg-white px-2.5 py-1 rounded-lg"><span>Participación</span><strong>${fmt(b.partRate)}%</strong></div>
+            <div class="flex justify-between bg-white px-2.5 py-1 rounded-lg"><span>Ocupación</span><strong>${fmt(b.ocupRate)}%</strong></div>
+            <div class="flex justify-between bg-white px-2.5 py-1 rounded-lg"><span>Informalidad</span><strong>${fmt(b.infRate)}%</strong></div>
+          </div>`;
+      }
+
+      // Organism Region Card + Map
+      document.getElementById('organismRegionCard').innerHTML = `
+        <div class="text-xs font-bold text-[#0D2847]">${regMeta.name}</div>
+        <div class="text-3xl font-extrabold text-[#0D2847] mt-0.5">${regPt.r !== null ? fmt(regPt.r) + '%' : 'Tabulado INE'}</div>
+        <div class="text-xs font-bold text-[#17859E] mt-1">${regPt.d !== null ? (regPt.d > 0 ? '▲ +' : '▼ ') + fmt(regPt.d) + ' pp anual' : 'Nacional: ' + fmt(b.nationalRate) + '%'}</div>
+        <div class="mt-2 pt-2 border-t border-slate-100 text-[10px] text-slate-500 flex justify-between"><span>Boletín:</span><strong class="font-mono text-slate-800">${b.shortQuarter}</strong></div>`;
+
+      const svg = document.getElementById('chileMapSvg');
+      svg.innerHTML = REGIONS_META.map(reg => {
+        const pt = b.regions[reg.id];
+        const rVal = pt ? pt.r : null;
+        const sel = reg.id === currentRegionId;
+        return `<path d="${reg.d}" fill="${getColor(rVal, sel)}" stroke="${sel ? '#FFFFFF' : '#FAF7F2'}" stroke-width="${sel ? '1.5' : '0.5'}" class="cursor-pointer" onclick="selectRegion('${reg.id}')"><title>${reg.name}: ${rVal !== null ? fmt(rVal) + '%' : 'Tabulado INE'}</title></path>`;
+      }).join('') + `<circle cx="${regMeta.cx}" cy="${regMeta.cy}" r="3.5" fill="#17859E" stroke="#FFFFFF" stroke-width="1.5"/>`;
+
+      document.getElementById('mapSelName').textContent = regMeta.name;
+      document.getElementById('mapSelRate').textContent = regPt.r !== null ? fmt(regPt.r) + '% INE' : 'Tabulado INE';
+      document.getElementById('miniTag').textContent = regMeta.num;
+      document.getElementById('miniRate').textContent = regPt.r !== null ? fmt(regPt.r) + '%' : 'INE';
+      document.getElementById('miniTitle').textContent = regMeta.name;
+      document.getElementById('miniDesc').textContent = regPt.r !== null ? `Presenta una tasa de desocupación de ${fmt(regPt.r)}%.` : `Consultar tabulado regional oficial para ${b.shortQuarter}.`;
+
+      // Column 5 Page
+      const pStat = document.getElementById('pageMainStat');
+      const pChart = document.getElementById('pageChartContainer');
+      if (currentDemoMode === 'general') {
+        pStat.innerHTML = `<div class="text-xs text-slate-600 font-medium">Tasa de desocupación nacional (${b.shortQuarter})</div><div class="text-4xl font-extrabold text-[#0D2847] mt-1">${fmt(b.nationalRate)}%</div><div class="text-xs font-bold text-[#17859E] mt-1">▲ +${fmt(b.nationalDelta)} pp en doce meses</div>`;
+        pChart.innerHTML = `<div class="grid grid-cols-6 gap-1 items-end w-full h-28 pt-3 pb-1">${TREND_2026.map(pt => {
+          const h = Math.round(((pt.rate - 7.5) / 3) * 52) + 28;
+          const act = b.shortQuarter.startsWith(pt.label);
+          return `<div class="flex flex-col items-center min-w-0"><span class="text-[8px] font-bold mb-1">${fmt(pt.rate)}%</span><div class="w-full max-w-[20px] rounded-t-sm ${act ? 'bg-[#0D2847] ring-1 ring-[#17859E]' : 'bg-[#17859E]'}" style="height:${h}px"></div><span class="text-[7px] font-mono text-slate-500 mt-1 truncate">${pt.label}</span></div>`;
+        }).join('')}</div><div class="text-[8.5px] text-slate-500 text-center mt-1">Serie oficial trimestres móviles 2026 (INE)</div>`;
+      } else if (currentDemoMode === 'genero') {
+        pStat.innerHTML = `<div class="text-xs text-slate-600 font-medium">Desocupación por Sexo</div><div class="text-4xl font-extrabold text-[#0D2847] mt-1">${fmt(b.mujeres.rate)}%</div><div class="text-xs font-bold text-[#17859E] mt-1">Brecha: +${fmt(b.mujeres.rate - b.hombres.rate)} pp en mujeres</div>`;
+        pChart.innerHTML = `<div class="flex items-end justify-around h-28 pt-3 pb-1"><div class="flex flex-col items-center"><span class="text-[10px] font-black mb-1">${fmt(b.mujeres.rate)}%</span><div class="w-9 bg-[#0D2847] h-20 rounded-t-lg"></div><span class="text-[11px] font-bold mt-1">Mujeres</span></div><div class="flex flex-col items-center"><span class="text-[10px] font-black text-[#17859E] mb-1">${fmt(b.hombres.rate)}%</span><div class="w-9 bg-[#17859E] h-16 rounded-t-lg"></div><span class="text-[11px] font-bold mt-1">Hombres</span></div></div>`;
+      } else {
+        pStat.innerHTML = `<div class="text-xs text-slate-600 font-medium">Tasa de Participación Nacional</div><div class="text-4xl font-extrabold text-[#0D2847] mt-1">${fmt(b.partRate)}%</div><div class="text-xs font-bold text-[#17859E] mt-1">Ocupación: ${fmt(b.ocupRate)}% · Inf.: ${fmt(b.infRate)}%</div>`;
+        pChart.innerHTML = `<div class="grid grid-cols-3 gap-2 items-end h-28 pt-3 pb-1"><div class="flex flex-col items-center"><span class="text-[9px] font-black mb-1">${fmt(b.partRate)}%</span><div class="w-7 bg-[#0D2847] h-20 rounded-t-md"></div><span class="text-[9px] font-bold mt-1">Particip.</span></div><div class="flex flex-col items-center"><span class="text-[9px] font-black text-[#17859E] mb-1">${fmt(b.ocupRate)}%</span><div class="w-7 bg-[#17859E] h-16 rounded-t-md"></div><span class="text-[9px] font-bold mt-1">Ocupac.</span></div><div class="flex flex-col items-center"><span class="text-[9px] font-black mb-1">${fmt(b.infRate)}%</span><div class="w-7 bg-[#A5D8E2] h-10 rounded-t-md"></div><span class="text-[9px] font-bold mt-1">Informal.</span></div></div>`;
+      }
+      document.getElementById('pageSourceLine').textContent = `Fuente: INE - Encuesta Nacional de Empleo (${b.shortQuarter})`;
+    }
+
+    function changeBulletin(id) { currentBulletinId = id; renderAll(); if (!document.getElementById('levelOverlay').classList.contains('hidden')) renderOverlay(); }
+    function selectRegion(id) { currentRegionId = id; renderAll(); }
+    function nextRegion() {
+      const idx = REGIONS_META.findIndex(r => r.id === currentRegionId);
+      currentRegionId = REGIONS_META[(idx + 1) % REGIONS_META.length].id;
+      renderAll();
+    }
+    function setDemoMode(mode) { currentDemoMode = mode; renderAll(); }
+    function copyHex(hex, name) {
+      navigator.clipboard?.writeText(hex);
+      const fb = document.getElementById('copyFeedback');
+      fb.textContent = `✓ Copiado ${name} (${hex})`;
+      fb.classList.remove('hidden');
+      setTimeout(() => fb.classList.add('hidden'), 1500);
+    }
+
+    function openLevelOverlay(lvl) {
+      currentOverlayLevel = lvl;
+      document.getElementById('levelOverlay').classList.remove('hidden');
+      renderOverlay();
+    }
+    function closeLevelOverlay() { document.getElementById('levelOverlay').classList.add('hidden'); }
+
+    function renderOverlay() {
+      const b = INE_2026_BULLETINS[currentBulletinId];
+      const doc = LEVEL_DOCS[currentOverlayLevel];
+      document.getElementById('overlayTitle').textContent = doc.title + ' · ' + b.quarter;
+      const keys = [['atomos','1. Átomos'],['moleculas','2. Moléculas'],['organismos','3. Organismos'],['plantillas','4. Plantillas'],['paginas','5. Páginas']];
+      document.getElementById('overlayTabs').innerHTML = keys.map(([k, lbl]) =>
+        `<button onclick="openLevelOverlay('${k}')" class="px-3.5 py-1.5 rounded-xl text-xs font-bold cursor-pointer ${k === currentOverlayLevel ? 'bg-[#0D2847] text-white' : 'bg-[#FAF7F2] text-slate-700 border border-slate-200'}">${lbl}</button>`
+      ).join('');
+
+      document.getElementById('overlayBody').innerHTML = `
+        <div class="lg:col-span-7 space-y-4">
+          <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm space-y-3">
+            <span class="text-[10px] font-bold uppercase text-[#17859E]">Vista Interactiva del Nivel (${b.label})</span>
+            <h3 class="text-lg font-black text-[#0D2847]">${doc.title}</h3>
+            <div class="bg-[#EAF4F7] p-4 rounded-2xl border border-[#A5D8E2]/60 text-xs space-y-2">
+              <div><strong>Boletín Activo:</strong> ${b.quarter} (Publicado: ${b.pubDate})</div>
+              <div><strong>Tasa Desocupación Nacional:</strong> <span class="text-lg font-black text-[#0D2847]">${fmt(b.nationalRate)}%</span> (+${fmt(b.nationalDelta)} pp)</div>
+              <div><strong>Mujeres:</strong> ${fmt(b.mujeres.rate)}% · <strong>Hombres:</strong> ${fmt(b.hombres.rate)}% · <strong>Informalidad:</strong> ${fmt(b.infRate)}%</div>
+              <p class="text-slate-700 leading-relaxed pt-1">${b.summary}</p>
+            </div>
+          </div>
+          <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm space-y-2">
+            <h4 class="text-xs font-bold uppercase text-[#0D2847]">Decisiones Visuales</h4>
+            <ul class="space-y-1.5 text-xs text-slate-700">
+              ${doc.visual.map(v => `<li class="bg-[#FAF7F2] p-2.5 rounded-xl border border-slate-200">• ${v}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
+        <div class="lg:col-span-5 space-y-4">
+          <div class="bg-[#0D2847] text-white p-5 rounded-3xl space-y-1.5">
+            <span class="text-[10px] font-mono uppercase text-[#A5D8E2]">Justificación Inicial</span>
+            <p class="text-sm font-extrabold italic">«${doc.initial}»</p>
+          </div>
+          <div class="bg-white p-5 rounded-3xl border border-slate-200 space-y-1.5">
+            <h4 class="text-xs font-bold uppercase text-[#17859E]">Argumentación Funcional</h4>
+            <p class="text-xs text-slate-700 leading-relaxed">${doc.functional}</p>
+          </div>
+          <div class="bg-[#0D2847] text-white p-5 rounded-3xl space-y-2">
+            <span class="text-[10px] font-mono uppercase text-[#A5D8E2]">Datos Técnicos & Uso Estadístico INE</span>
+            <p class="text-xs text-slate-200 leading-relaxed">${doc.stats}</p>
+          </div>
+          <div class="bg-[#EAF4F7] p-5 rounded-3xl border border-[#A5D8E2]/60 space-y-1.5">
+            <h5 class="text-xs font-bold text-[#0D2847]">Impacto Cívico & Periodístico</h5>
+            <p class="text-xs text-slate-700 leading-relaxed">${doc.civic}</p>
+          </div>
+        </div>`;
+    }
+
+    function openGlossaryModal() {
+      document.getElementById('glossaryContent').innerHTML = ENE_GLOSSARY_2025.map(g => `
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 space-y-1.5">
+          <h3 class="text-sm font-black text-[#0D2847]">${g.term}</h3>
+          <p class="text-xs text-slate-700 leading-relaxed">${g.def}</p>
+          ${g.formula ? `<div class="bg-[#0D2847] text-[#A5D8E2] text-[11px] font-mono p-2 rounded-xl">${g.formula}</div>` : ''}
+        </div>`).join('');
+      document.getElementById('glossaryModal').classList.remove('hidden');
+    }
+    function closeGlossaryModal() { document.getElementById('glossaryModal').classList.add('hidden'); }
+
+    function openWhyModal() {
+      document.getElementById('whyContent').innerHTML = WHY_BUTTONS.map(w => `
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 space-y-1">
+          <div class="flex justify-between"><strong class="text-sm text-[#0D2847]">${w.name}</strong><span class="text-[10px] font-mono bg-[#FAF7F2] px-2 py-0.5 rounded">${w.cat}</span></div>
+          <p class="text-xs text-slate-600">${w.desc}</p>
+        </div>`).join('');
+      document.getElementById('whyModal').classList.remove('hidden');
+    }
+    function closeWhyModal() { document.getElementById('whyModal').classList.add('hidden'); }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') { closeLevelOverlay(); closeGlossaryModal(); closeWhyModal(); }
+    });
+
+    renderAll();
+  </script>
+</body>
+</html>
